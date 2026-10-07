@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>東專附設高職部｜學生獎懲條文查詢</title>
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--ink:#1f2937;--muted:#6b7280;
+  --blue:#1d4ed8;--green:#047857;--red:#b91c1c;--amber:#b45309;
+  --line:#e5e7eb;--radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);color:#fff;padding:28px 20px;text-align:center}
+header h1{margin:0 0 6px;font-size:22px}
+header p{margin:0;opacity:.9;font-size:14px}
+main{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+.search-box{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.search-box label{font-weight:700;font-size:15px}
+#q{width:100%;margin-top:8px;padding:12px 14px;font-size:16px;border:2px solid var(--line);border-radius:8px}
+#q:focus{outline:none;border-color:var(--blue)}
+.hint{margin-top:8px;color:var(--muted);font-size:13px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.filters button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;cursor:pointer}
+.filters button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+#results{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:var(--radius);padding:16px 18px;box-shadow:0 1px 6px rgba(0,0,0,.05);border-left:6px solid var(--line)}
+.card.reward{border-left-color:var(--green)}
+.card.punish-warn{border-left-color:var(--amber)}
+.card.punish-minor{border-left-color:#ea580c}
+.card.punish-major{border-left-color:var(--red)}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:12px;margin-bottom:6px}
+.badge.reward{background:#d1fae5;color:var(--green)}
+.badge.warn{background:#fef3c7;color:var(--amber)}
+.badge.minor{background:#ffedd5;color:#c2410c}
+.badge.major{background:#fee2e2;color:var(--red)}
+.card .text{font-size:15px;line-height:1.7}
+.card .src{margin-top:8px;font-size:12px;color:var(--muted)}
+#count{margin-top:14px;color:var(--muted);font-size:13px}
+.disclaimer{margin-top:24px;background:#fffbeb;border:1px solid #fcd34d;border-radius:var(--radius);padding:14px 16px;font-size:13px;line-height:1.8;color:#92400e}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+.kw{background:#fef08a;padding:0 2px;border-radius:3px}
+.ai-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+#aiBtn{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer}
+#aiBtn:disabled{opacity:.5;cursor:not-allowed}
+#aiStatus{font-size:13px;color:var(--muted);align-self:center}
+#aiResults{margin-top:14px;display:flex;flex-direction:column;gap:12px}
+.card.ai{border-left-color:#7c3aed;background:#faf5ff}
+.badge.ai{background:#ede9fe;color:#6d28d9}
+.ai-reason{margin-top:6px;font-size:13px;color:#5b21b6;background:#ede9fe;border-radius:6px;padding:6px 10px}
+.conf{font-size:12px;color:var(--muted);margin-left:6px}
+details.settings{margin-top:14px;background:#f9fafb;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:14px}
+details.settings summary{cursor:pointer;font-weight:700}
+.settings label{display:block;margin-top:10px;font-size:13px;font-weight:700}
+.settings select,.settings input{width:100%;margin-top:4px;padding:8px 10px;font-size:14px;border:1px solid var(--line);border-radius:6px}
+.settings .row2{display:flex;gap:8px;margin-top:10px}
+.settings .row2 button{flex:1;padding:8px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
+#keyHelp{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.8}
+#keyHelp a{color:var(--blue)}
+.warn-banner{display:none;margin-top:10px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px 12px;font-size:13px;color:#991b1b;line-height:1.7}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #c4b5fd;border-top-color:#7c3aed;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>國立臺東專科學校附設高職部<br>學生獎懲條文查詢</h1>
+  <p>輸入學生行為關鍵字，快速找到對應獎勵 / 懲處條文 · 供教師參考</p>
+</header>
+<main>
+  <div class="search-box">
+    <label for="q">描述學生行為（例如：上課玩手機、拾金不昧、打架、抽菸）</label>
+    <input id="q" type="text" placeholder="輸入關鍵字，如：手機、遲到、打架、菸、霸凌、考試作弊…" autocomplete="off">
+    <div class="hint">支援多關鍵字（空白分隔）。所有資料皆在本機瀏覽器運算，不會上傳任何內容。</div>
+    <div class="filters" id="filters">
+      <button data-f="all" class="active">全部</button>
+      <button data-f="嘉獎">嘉獎</button>
+      <button data-f="小功">小功</button>
+      <button data-f="大功">大功</button>
+      <button data-f="警告">警告</button>
+      <button data-f="小過">小過</button>
+      <button data-f="大過">大過</button>
+    </div>
+    <div class="ai-row">
+      <button id="aiBtn">✨ AI 協助判讀</button>
+      <span id="aiStatus">本地關鍵字搜尋免設定即可用；AI 判讀需先在下方設定 API Key</span>
+    </div>
+    <div class="warn-banner" id="warnBanner"></div>
+    <details class="settings" id="settingsBox">
+      <summary>⚙️ AI 設定（選用，預設 Gemini 免費額度）</summary>
+      <label>AI 供應商
+        <select id="provider">
+          <option value="gemini">Google Gemini（免費額度・推薦）</option>
+          <option value="groq">Groq（免費額度・速度快）</option>
+          <option value="openrouter">OpenRouter（部分免費模型）</option>
+          <option value="grok">xAI Grok（付費）</option>
+          <option value="ollama">Ollama 本地模型（免 Key・需本機安裝）</option>
+        </select>
+      </label>
+      <label>API Key（只存於本機瀏覽器，不會上傳別處）
+        <input id="apiKey" type="password" placeholder="貼上 API Key（Ollama 本地模型免填）" autocomplete="off">
+      </label>
+      <label>模型名稱（留空用預設值）
+        <input id="modelName" type="text" placeholder="例：gemini-3.5-flash-lite" autocomplete="off">
+      </label>
+      <div class="row2">
+        <button id="saveKey">儲存設定</button>
+        <button id="clearKey">清除 Key</button>
+      </div>
+      <div id="keyHelp"></div>
+    </details>
+  </div>
+  <div id="count"></div>
+  <div id="aiResults"></div>
+  <div id="results"></div>
+  <div class="disclaimer">
+    <strong>⚠️ 使用聲明：</strong><br>
+    1. 本工具僅供教師查詢條文參考，最終獎懲裁決依學校獎懲委員會及校長核定為準。<br>
+    2. 懲處前應給予學生陳述意見機會，並注意比例原則、保密原則。<br>
+    3. 學生或法定代理人於通知送達次日起 30 日內，得向學生申訴評議委員會提起申訴。<br>
+    4. 法規版本：民國 114 年 12 月 10 日核備版；法規修訂時請更新資料檔。
+  </div>
+  <footer>資料來源：本校學生獎懲辦法 · 教育部「高級中等學校訂定學生獎懲規定注意事項」</footer>
+</main>
+<script>
+let DB = null;
+let curFilter = 'all';
+
+const LEVEL = {
+  '嘉獎':{cls:'reward',badge:'reward',label:'獎勵 · 嘉獎'},
+  '小功':{cls:'reward',badge:'reward',label:'獎勵 · 小功'},
+  '大功':{cls:'reward',badge:'reward',label:'獎勵 · 大功'},
+  '警告':{cls:'punish-warn',badge:'warn',label:'懲處 · 警告'},
+  '小過':{cls:'punish-minor',badge:'minor',label:'懲處 · 小過'},
+  '大過':{cls:'punish-major',badge:'major',label:'懲處 · 大過'}
+};
+
+const EMBEDDED_DB = {"rewards":{"嘉獎":["服裝儀容整潔足為同學模範者。","禮節周到足為同學模範者。","學生家長參加懇親會者。","拾物不昧者(價值較低)。","打掃認真負責者。","為團體服務表現優良者。","校外言行表現良好者。","做事認真負責足為同學模範者。","全學期作業按時繳交者。","學期作業抽查全部按時繳交者。","執行廢電池回收、垃圾分類或資源回收績效優異者。","擔任學校重要活動公差表現優異者。","參與班級活動或競賽表現優異人員。","參加校外活動成績優異者。","參加教學成果展認真負責成績優異者。","參加班際競賽成績第二名(嘉獎二次）。","參加班際競賽成績第三名(嘉獎一次）。","生活榮譽競賽成績優良累計滿三次(嘉獎一次）。","熱心助人，義行可嘉者。","熱心公益活動，足資示範者","拾金(物)不昧，其行可嘉者。","擔任學校、班級、社團幹部認真負責者。","參加學校辦理之各項活動或競賽成績表現良好者。","代表學校參加校外各種活動或競賽成績表現良好者。","生活週記、作業書寫及各項心得寫作認真良好者。","節儉樸實足為同學模範者。","同學間能互助合作足為模範者。","經常自動為校(公)服務者。","舉發弊害經查明屬實者。","運動比賽時能表現體育道德者。","生活言行較前進步有事實表現者。","具有相當於上列各款事實者。"],"小功":["代表學校參加校外各種活動或競賽，成績表現優良者。","代表學校參加國際性活動或競賽，成績表現優良者。","遇有特殊事故處理得宜，獲良好效果者。","校外言行表現優異有具體事實者。","取得丙級技術士證照者。","校慶運動會參與服務工作表現優異者。","為團體服務熱心負責足為同學模範者。","拾物不昧其行為堪為表率者。","協助衛生工作表現良好者。","參加班際競賽成績第一名(小功一次）。","參加社團表演表現優異者。","參加校外運動比賽成績優異者。","擔任交通服務隊表現優異者(學期末檢討）。","擔任學校、班級、社團幹部，表現優良，負責盡職(學期末檢討）。","擔任環保義工負責盡職(學期末檢討）。","參與校內外公共事務及促進公益工作，表現優良者。","全學期全勤無缺曠者。","校外生活言行表現優異，有具體事實者。","推展正當性課餘活動，表現優良者。","見義勇為，增進團體或同學權益者。","敬老扶幼，表現優良者。","舉發重大弊害，經查明屬實者。","拾金(物)不昧，其行為足堪表率者。","具有相當於上列各款事實者。"],"大功":["推動社團活動有具體績優事實表現者。","愛護學校或同學確有特殊事實表現增進校譽者。","代表學校(或個人)參加校外活動成績特別優異。","拾物(價值貴重)不昧者。","校外重大優良事件能增進校譽有具體事實者。","長期表現孝順父母、友愛兄弟姊妹有具體績優事實者。","長期表現尊敬師長、友愛同學有具體績優事實者。","有特殊優良行為足為全校學生之模範者。","取得乙級技術士證照。","全學期環保義工每日執勤表現優異者(學期末檢討)。","有特殊優良行為裨益國家社會者。","參與校內外公共事務及促進公益工作，表現優異者。","提供優良建議，並能率先力行，增進校譽者。","具有相當於上列各款事實者。"]},"punishments":{"警告":["使用言語或文字、圖片、動作或影音等，當面或藉由平面、網路或其他電子媒介侵害他人名譽或侮辱、恐嚇、誹謗他人、致他人權益減損，情節輕微者。","在公共場所高聲喧嚷、慶生活動(使用刮鬍泡等清潔液、蛋糕奶油、麵粉造成環境污穢者)、嬉戲(如玩水潑濕教室、走廊地面、丟水球)、教學區打球等言行，已影響他人權益、環境衛生或校園安全公共秩序，經勸導後仍未改正，情節輕微者。","未經允許使用實習場所教學設備，致影響他人權益或破壞公共設備，經勸導後仍未改正，情節輕微者。","不假離校、外出，情節輕微者。","不遵守道路交通安全規則，情節輕微者。","上課不遵守課堂秩序，影響他人學習，經勸導後仍未改正者。","上課時未遵守本校學生使用行動載具或各類型3C產品(泛指手機、可攜式電腦、平板電腦、穿戴式裝置、掌上型電動或新型電子通訊與遊戲產品)之規定，經勸導後仍未改正，情節輕微者。","不遵守請假規定，經勸導後仍未改正，情節輕微者。","無故未參加愛校服務，經勸導後仍未改正者(不含服儀違規、學習或非學習節數活動出缺席、遲到)。","侵犯他人隱私，經勸導後仍未改正者。","未經核准擅自在校園公共區域張貼海報、傳單或於公共設施、環境隨意塗寫、塗畫，造成校園環境汙染或有危害校園學習環境秩序、公共利益或影響其他學生學習權益，情節輕微者。","非用於教學上玩撲克牌等遊戲牌卡、象棋、玩具代幣及骰子等，經勸導後仍未改正者。","校內用電致生公共危險之虞，或影響正常教學，經勸導後仍未改正，情節輕微者。","無正當理由，不服從師長執行公共事務之指導或糾正，經勸導仍未改正，情節輕微者。","擔任各級幹部不負責盡職，影響工作推展，情節輕微者。","拾金(物)不送招領，欲據為己有，已有悔悟者。","無正當理由，不服從學生幹部執行公共事務之糾正，經勸導仍未改正，情節輕微者。","因過失損壞公物，而隱匿事實，不自動報告者。","亂丟垃圾，或有其他破壞環境衛生行為，情節輕微者。","有侵占或詐欺行為，或毀損他人財物，情節輕微者。","擅自侵害著作人法定權益或侵入他人資訊系統或設備，情節輕微者。","同學吵架或發生糾紛，經提醒後未改正，影響教學活動或團體秩序，情節輕微者。","蓄意未依時完成公共服務，經勸導無效，影響公共事務之推動者。","違規考場規則，情節輕微者。","蓄意占用或損壞學校圖書或教學器材，經勸導仍未改正，情節輕微者。","違反本校「宿舍管理要點」，經勸導仍未改正，情節輕微者。"],"小過":["在公共場所高聲喧嚷、慶生活動(使用刮鬍泡等清潔液、蛋糕奶油、麵粉造成環境污穢者)、嬉戲(如玩水潑濕教室、走廊地面、丟水球)、教學區打球等言行，已影響他人權益、環境衛生或校園安全公共秩序，經勸導後仍未改正，情節尚非重大者。","未經允許使用實習場所教學設備，致影響他人權益或破壞公共設備，經勸導後仍未改正，情節嚴重者。","不假離校外出或越牆進出學校，情節嚴重者。","違反道路交通安全規則，情節尚非重大者。","上課不遵守課堂秩序，影響他人學習，屢勸不聽或情節嚴重者。","上課時未遵守本校學生使用行動電話(手機)管制規定，屢勸不聽或情節嚴重者。","不遵守請假規定，情節嚴重者。","蓄意未依時完成公共服務，經勸導無效，嚴重影響公共事務之推動者。","蓄意嘲笑、謾罵、驚嚇、惡作劇等不受歡迎行為欺侮同學，已影響他人權益或校園公共秩序，經勸導後仍未改正者。","聚眾滋事，經查為當事人或當事人邀約(含當事人授意他人邀約)一同助勢，造成校園團體秩序混亂或干擾他人正常作息、致使他人身心恐懼，情節輕微者。","拾金(物)不送招領，欲據為己有，而無悔悟者。","無正當理由，不服從學生幹部執行公共事務之糾正，經勸導仍未改正，情節嚴重者。","故意攀折花木或其他損壞公物之情事，情節較輕者。","有侵占或詐欺行為，或毀損他人財物，情節較輕者。","違反本校「定期考試注意要點」第七條一至八項所規定者，記小過乙次；第八條一至五項所規定者，記小過兩次。","毆打他人，情節輕微者。","冒用或偽造、變造文書、準文書、印章印文、署押，情節輕微者。","有竊盜行為，但有悔意者。","校內(外)攜帶或吸食菸品(含電子煙、類菸品)、打火機具、酒、檳榔，情節較輕者。","攜帶「學校訂定教師輔導與管教學生辦法注意事項第31點」所指違法或違禁物品到校者，情節較輕者。","經宣導後，仍至危險水域或未經公告為合格水域戲水，情節較輕者。","出入禁止十八歲以下進入之場所，情節較輕者。","違反「教育部校園網路使用規範」之行為，或侵入他人資訊系統、設備，情節較輕者。","攜帶或閱讀有害其身心健康、暴力、血腥、色情、猥褻、賭博之出版品、圖畫、錄影節目帶、影片、光碟、磁片、電子訊號、遊戲軟體、網際網路內容或其他物品，情節輕微，已有悔悟者。","經本校性別平等教育委員會審議認定有校園性別事件，情節輕微者。","使用言語或文字、圖片、動作或影音等，當面或藉由平面、網路或其他電子媒介侵害他人名譽或侮辱、恐嚇、誹謗他人、致他人權益減損，情節尚非重大者。","亂丟垃圾，或有其他破壞環境衛生行為，情節嚴重者。","擅自侵害著作人法定權益，情節尚非重大者。","協助同學偷竊或考試舞弊經查屬實者。","本校依校園霸凌防制準則所定程序，經調查確認有霸凌行為，且情節輕微者。","校內外聚眾賭博(含線上賭博)，情節輕微者。","蓄意占用或損壞學校圖書或教學器材，經勸導仍未改正，情節嚴重者。"],"大過":["違反道路交通安全規則，情節嚴重者。","聚眾滋事，經查為當事人或當事人邀約(含當事人授意他人邀約)一同助勢，造成校園團體秩序混亂或干擾他人正常作息、致使他人身心恐懼，情節嚴重者。","在公共場所高聲喧嚷、慶生活動(使用刮鬍泡等清潔液、蛋糕奶油、麵粉造成環境污穢者)、嬉戲(如玩水潑濕教室、走廊地面、丟水球)、教學區打球等言行，已影響他人權益、環境衛生或校園安全公共秩序，經勸導後仍未改正，情節嚴重者。","毀壞學校公物或環境、浪費資源，致影響他人學習，情節嚴重者。如學生毀損公物應負賠償責任時，由學校通知監護權人辦理。","有偷竊、侵占或詐欺行為，或毀損他人財物，情節嚴重者。","違反本校「定期考試注意要點」，第六條及第九條所規定者，依情節輕重記大過乙至兩次。","毆打他人致傷或同學互相鬥毆，情節嚴重者。","塗改、製造、偽造、變造、冒用或使用有價票券、點名簿、請假單、文書、準文書、印章印文、署押，情節嚴重者。","強行借用、竊盜、搶奪他人財物，情節嚴重者。","校內(外)攜帶或吸食菸品(含電子煙、類菸品)、打火機具、酒、檳榔，情節嚴重者。","經宣導後，仍至危險水域或未經公告為合格水域戲水，屢勸不聽或情節嚴重者。","出入禁止十八歲以下進入之場所，情節嚴重者。","本校依校園霸凌防制準則所定程序，經調查確認有霸凌行為，且情節嚴重者。","成立幫派或參加校外不良幫派、組織者。","施用毒品、非法施用管制藥品或其他有害身心健康之物質。","違反「教育部校園網路使用規範」之行為，或侵入他人資訊系統、設備，情節嚴重者。","攜帶或閱讀有害其身心健康、暴力、血腥、色情、猥褻、賭博之出版品、圖畫、錄影節目帶、影片、光碟、磁片、電子訊號、遊戲軟體、網際網路內容或其他物品，情節嚴重者。","經本校性別平等教育委員會審議認定有校園性別事件行為屬實，情節重大者，但未滿18歲之學生間合意發生刑法第二二七條之行為者，不在此限。","攜帶「學校訂定教師輔導與管教學生辦法注意事項第31點」所指違法(刀械、槍砲彈藥)或違禁物品到校，有妨害公共安全之虞，情節嚴重者。","不假離校外出或越牆進出學校，屢勸不聽者。","擅自侵害著作人法定權益，情節嚴重者。","建立色情暴力網站或利用網路資源從事不法行為，情節嚴重者。","使用言語或文字、圖片、動作或影音等，當面或藉由平面、網路或其他電子媒介侵害他人名譽或侮辱、恐嚇、誹謗他人、致他人權益減損，情節嚴重者。"]}};
+async function load(){
+  try{
+    const r = await fetch('./reference_docs/ntc_reward_punishment.json');
+    if(r.ok){ DB = await r.json(); }
+    else{ DB = EMBEDDED_DB; }
+  }catch(e){ DB = EMBEDDED_DB; }
+  render('');
+}
+function allItems(){
+  const out=[];
+  for(const [lv,arr] of Object.entries(DB.rewards)) arr.forEach((t,i)=>out.push({level:lv,text:t,idx:i+1,cat:'reward'}));
+  for(const [lv,arr] of Object.entries(DB.punishments)) arr.forEach((t,i)=>out.push({level:lv,text:t,idx:i+1,cat:'punish'}));
+  return out;
+}
+// 同義詞擴展（對應本校獎懲辦法用語）
+const SYN = {
+  '手機':['行動載具','3C','行動電話','手機','穿戴式裝置','平板電腦'],
+  '抽菸':['菸品','電子煙','類菸品','吸食菸品','打火機具'],
+  '喝酒':['酒'],
+  '檳榔':['檳榔'],
+  '打架':['毆打','鬥毆'],
+  '作弊':['舞弊','考場規則','定期考試注意要點'],
+  '遲到':['請假','缺曠','曠課','全勤'],
+  '曠課':['不假離校','外出','越牆'],
+  '偷':['竊盜','偷竊','侵占','詐欺','搶奪','強行借用'],
+  '罵人':['侮辱','謾罵','恐嚇','誹謗','嘲笑','惡作劇','驚嚇'],
+  '霸凌':['霸凌','欺侮','校園霸凌防制準則'],
+  '性騷':['性別平等','校園性別事件','性騷擾','性霸凌'],
+  '賭':['賭博','線上賭博','聚眾賭博'],
+  '毒':['毒品','管制藥品'],
+  '幫派':['幫派','不良幫派'],
+  '刀':['刀械','槍砲彈藥','違禁物品','違法物品','危險物品'],
+  '上網':['網路','資訊系統','教育部校園網路使用規範','色情暴力網站'],
+  '色情':['色情','猥褻','暴力','血腥'],
+  '破壞':['損壞公物','毀損','攀折花木','毀壞學校公物','占用或損壞學校圖書'],
+  '垃圾':['垃圾','環境衛生','亂丟垃圾','資源回收','垃圾分類','廢電池回收'],
+  '吵':['喧嚷','吵架','糾紛','秩序','高聲喧嚷','嬉戲','慶生活動'],
+  '服儀':['服裝儀容','儀容'],
+  '拾金':['拾金','拾物不昧'],
+  '幹部':['幹部'],
+  '比賽':['競賽','比賽','活動','班際競賽','生活榮譽競賽','教學成果展','校慶運動會','社團表演'],
+  '證照':['證照','技術士','丙級','乙級'],
+  '全勤':['全勤','無缺曠'],
+  '作業':['作業','週記','心得'],
+  '公差':['公差','愛校服務','公共服務','環保義工','交通服務隊'],
+  '偽造':['偽造','變造','冒用','塗改','文書','印章','署押','請假單','點名簿'],
+  '隱私':['隱私'],
+  '著作':['著作','智慧財產'],
+  '撲克牌':['撲克牌','遊戲牌卡','象棋','骰子'],
+  '牌':['撲克牌','牌卡','象棋','玩具代幣','骰子'],
+  '玩':['撲克牌','遊戲','嬉戲'],
+  '帶':['攜帶'],
+  '香菸':['菸品','電子煙'],
+  '宿舍':['宿舍','宿舍管理要點'],
+  '危險水域':['危險水域','戲水'],
+  '網咖':['十八歲以下進入之場所'],
+  '聚眾':['聚眾滋事'],
+  '用電':['用電','公共危險']
+};
+function expand(kws){
+  const out=new Set(kws);
+  for(const k of kws){ for(const [key,vals] of Object.entries(SYN)){ if(k.includes(key)||key.includes(k)) vals.forEach(v=>out.add(v)); } }
+  return [...out];
+}
+function score(item, kws){
+  let s=0;
+  for(const k of kws){ if(!k) continue; if(item.text.includes(k)) s+= k.length>=2?3:1; }
+  return s;
+}
+/* 逐字 IDF 備援：無空白中文（如「帶牌來玩」）或錯字時，依稀有字加權排序 */
+function idfWeights(){
+  if(idfWeights._c) return idfWeights._c;
+  const items=allItems(); const N=items.length; const df={};
+  items.forEach(o=>{ const s=new Set(o.text.replace(/[^\u4e00-\u9fffA-Za-z0-9]/g,'')); s.forEach(c=>{df[c]=(df[c]||0)+1;}); });
+  const w={}; for(const c in df){ w[c]=Math.log(1+N/df[c]); }
+  idfWeights._c=w; return w;
+}
+function charFallback(query,items,topN){
+  const W=idfWeights();
+  const qchars=[...new Set(String(query).replace(/[^\u4e00-\u9fffA-Za-z0-9]/g,''))];
+  if(qchars.length===0) return [];
+  return items.map(x=>{
+    let s=0; for(const c of qchars){ if(x.text.includes(c)) s+=(W[c]||0); }
+    return {x,s};
+  }).filter(o=>o.s>0).sort((a,b)=>b.s-a.s).slice(0,topN||8).map(o=>o.x);
+}
+function hi(text,kws){
+  let t=text;
+  const sorted=[...kws].filter(Boolean).sort((a,b)=>b.length-a.length);
+  for(const k of sorted){ if(k.length<1) continue; t=t.split(k).join('<span class="kw">'+k+'</span>'); }
+  return t;
+}
+function render(query){
+  const box=document.getElementById('results');
+  const cnt=document.getElementById('count');
+  let items=allItems();
+  if(curFilter!=='all') items=items.filter(x=>x.level===curFilter);
+  const kws=query.trim().split(/\s+/).filter(Boolean);
+  let shown;
+  if(kws.length===0){ shown=items; }
+  else{
+    const ex=expand(kws);
+    shown=items.map(x=>({x,s:score(x,ex)})).filter(o=>o.s>0).sort((a,b)=>b.s-a.s).map(o=>o.x);
+    if(shown.length===0 && /[\u4e00-\u9fff]/.test(query)){ shown=charFallback(query,items,8); }
+  }
+  cnt.textContent = kws.length===0 ? `共 ${shown.length} 條（請輸入關鍵字篩選）` : `找到 ${shown.length} 條相關條文`;
+  box.innerHTML = shown.map(o=>{
+    const L=LEVEL[o.level];
+    return `<div class="card ${L.cls}"><span class="badge ${L.badge}">${L.label} · 第${o.idx}款</span><div class="text">${hi(o.text,kws)}</div><div class="src">出處：附設高職部學生獎懲辦法 · ${o.level}第${o.idx}款</div></div>`;
+  }).join('') || '<div class="card">查無相關條文，請換個關鍵字試試（例如：手機、打架、抽菸、霸凌）。</div>';
+}
+/* ============ AI 多供應商判讀（RAG） ============ */
+const PROVIDERS = {
+  gemini:{label:'Google Gemini',base:'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',model:'gemini-3.5-flash-lite',
+    keyUrl:'https://aistudio.google.com/apikey',
+    help:'<b>免費 Key 申請（約 3 分鐘）：</b><br>1. 前往 <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a> 並用 Google 帳號登入<br>2. 點「Create API key」→ 複製產生的 Key<br>3. 貼到上方欄位並按「儲存設定」<br>免費額度：Flash 系列模型輸入/輸出 token 免費（有限速，超速時會自動退回本地搜尋）。<br>若遇「模型已下架」錯誤，請將模型改為 <code>gemini-3.5-flash-lite</code> 或 <code>gemini-3.5-flash</code>（最新清單見 <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank">官方模型表</a>）。'},
+  groq:{label:'Groq',base:'https://api.groq.com/openai/v1/chat/completions',model:'llama-3.1-8b-instant',
+    keyUrl:'https://console.groq.com/keys',
+    help:'<b>免費 Key 申請：</b><br>1. 前往 <a href="https://console.groq.com/keys" target="_blank">Groq Console</a> 註冊登入（免綁卡）<br>2. 建立 API Key 並貼到上方欄位<br>免費額度：每分鐘 30 請求；小模型每天約 14,400 次。中文可改模型為 qwen/qwen3-32b。'},
+  openrouter:{label:'OpenRouter',base:'https://openrouter.ai/api/v1/chat/completions',model:'meta-llama/llama-3.1-8b-instruct:free',
+    keyUrl:'https://openrouter.ai/keys',
+    help:'<b>免費模型 Key 申請：</b><br>1. 前往 <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> 註冊並建立 Key<br>2. 模型名稱請用 <code>:free</code> 結尾的免費模型（預設已填）<br>免費模型有每日次數限制，額度較小。'},
+  grok:{label:'xAI Grok（付費）',base:'https://api.x.ai/v1/chat/completions',model:'grok-3-mini',
+    keyUrl:'https://console.x.ai/',
+    help:'<b>Grok 為付費服務：</b><br>1. 前往 <a href="https://console.x.ai/" target="_blank">xAI Console</a> 申請 API Key 並儲值<br>2. 貼到上方欄位。僅在學校已有 xAI 帳號時建議使用，否則優先用免費方案。'},
+  ollama:{label:'Ollama 本地模型（免 Key）',base:'http://localhost:11434/v1/chat/completions',model:'qwen2.5:7b',
+    keyUrl:'',
+    help:'<b>本地模型（完全免費、資料不出本機）：</b><br>1. 電腦安裝 <a href="https://ollama.com" target="_blank">Ollama</a> 並執行 <code>ollama pull qwen2.5:7b</code><br>2. 保持 Ollama 執行中，API Key 留空即可<br>注意：需用 <code>python -m http.server</code> 等本機伺服器開啟本頁（file:// 下瀏覽器會擋 localhost 連線）。'}
+};
+function getCfg(){
+  try{ return JSON.parse(localStorage.getItem('ntc_ai_cfg')||'{}'); }catch(e){ return {}; }
+}
+function saveCfg(c){ localStorage.setItem('ntc_ai_cfg', JSON.stringify(c)); }
+function refreshSettingsUI(){
+  const c=getCfg();
+  document.getElementById('provider').value=c.provider||'gemini';
+  document.getElementById('apiKey').value=c.key||'';
+  document.getElementById('modelName').value=c.model||'';
+  updateKeyHelp();
+  updateAiStatus();
+}
+function updateKeyHelp(){
+  const p=document.getElementById('provider').value;
+  document.getElementById('keyHelp').innerHTML=PROVIDERS[p].help+'<br>Key 僅儲存於本機瀏覽器 localStorage，不會傳給除所選 AI 供應商以外的任何對象。';
+}
+function updateAiStatus(){
+  const c=getCfg();
+  const el=document.getElementById('aiStatus');
+  if((c.provider||'gemini')==='ollama'||c.key){ el.textContent='AI 就緒（'+PROVIDERS[c.provider||'gemini'].label+'）· 僅傳送行為描述，不含個資'; }
+  else{ el.textContent='本地關鍵字搜尋免設定即可用；AI 判讀需先在下方設定 API Key'; }
+}
+document.getElementById('provider').addEventListener('change',updateKeyHelp);
+document.getElementById('saveKey').addEventListener('click',()=>{
+  saveCfg({provider:document.getElementById('provider').value,key:document.getElementById('apiKey').value.trim(),model:document.getElementById('modelName').value.trim()});
+  updateAiStatus(); alert('已儲存至本機瀏覽器');
+});
+document.getElementById('clearKey').addEventListener('click',()=>{
+  localStorage.removeItem('ntc_ai_cfg'); refreshSettingsUI(); alert('已清除');
+});
+/* ---- 輸入脫敏檢查：提醒勿含可識別資訊 ---- */
+function checkSensitive(q){
+  const hits=[];
+  if(/(年|級)?[一二三甲乙丙丁戊己庚辛壬癸\d]+班/.test(q)) hits.push('班級');
+  if(/座號|學號|學籍/.test(q)) hits.push('學號/座號');
+  if(/[王李張劉陳楊黃趙吳周徐孫馬朱胡林郭何羅梁宋鄭謝韓唐馮董蕭程曹袁鄧許傅沈曾彭呂蘇盧蔣蔡賈丁魏薛葉閻余潘杜戴夏鐘汪田任姜范方石姚譚廖鄒熊金陸郝孔白崔康毛邱秦江史顧侯邵孟龍萬段雷錢湯尹黎易常武喬賀賴龔文]/u.test(q)&&/同學|學生|他|她/.test(q)) hits.push('疑似姓名');
+  if(/\d{4,}/.test(q)) hits.push('疑似數字編號');
+  return hits;
+}
+/* ---- RAG：本地檢索候選 → AI 排序 → 以本地條文原文呈現（防幻覺） ---- */
+function topCandidates(query,n){
+  const kws=query.trim().split(/\s+/).filter(Boolean);
+  let items=allItems();
+  if(kws.length===0) return items.slice(0,n);
+  const ex=expand(kws);
+  let out=items.map(x=>({x,s:score(x,ex)})).filter(o=>o.s>0).sort((a,b)=>b.s-a.s).slice(0,n).map(o=>o.x);
+  if(out.length===0 && /[\u4e00-\u9fff]/.test(query)){ out=charFallback(query,items,n); }
+  return out;
+}
+function findItem(level,idx){
+  const arr=(DB.rewards[level]||DB.punishments[level]||[]);
+  return arr[idx-1]?{level,text:arr[idx-1],idx}:null;
+}
+async function aiJudge(){
+  const q=document.getElementById('q').value.trim();
+  const box=document.getElementById('aiResults');
+  const btn=document.getElementById('aiBtn');
+  if(!q){ box.innerHTML='<div class="card ai">請先輸入學生行為描述，再按 AI 判讀。</div>'; return; }
+  const hits=checkSensitive(q);
+  const wb=document.getElementById('warnBanner');
+  if(hits.length>0){
+    wb.style.display='block';
+    wb.innerHTML='⚠️ 偵測到輸入可能含有可識別資訊（'+hits.join('、')+'）。為保護學生隱私，請刪除姓名、班級、座號後再查詢。本次仍可繼續，但請確認已去識別化。';
+  } else { wb.style.display='none'; wb.innerHTML=''; }
+  const cfg=getCfg();
+  const p=cfg.provider||'gemini';
+  const P=PROVIDERS[p];
+  if(p!=='ollama'&&!cfg.key){
+    box.innerHTML='<div class="card ai">尚未設定 API Key。請展開下方「⚙️ AI 設定」選擇供應商並貼上 Key（Gemini 免費，約 3 分鐘可申請）。本地關鍵字結果仍顯示於下方。</div>';
+    document.getElementById('settingsBox').open=true;
+    return;
+  }
+  btn.disabled=true;
+  box.innerHTML='<div class="card ai"><span class="spin"></span>AI 判讀中（僅傳送行為描述＋候選條文，不含任何個資）…</div>';
+  try{
+    const cands=topCandidates(q,10);
+    const candText=cands.map(o=>`【${o.level}-${o.idx}】${o.text}`).join('\n');
+    const sys='你是國立臺東專科學校附設高職部學務處獎懲條文查詢助手，唯一依據為該校學生獎懲辦法（民國114年12月10日核備版）。使用者會給你一段學生行為描述，以及一份候選條文清單（每條格式為【等級-款號】條文內容，皆出自該校辦法第六至十一條）。你的任務：從候選清單中選出最相關的 1 至 3 條，依相關度排序。你只能選擇清單中存在的編號，絕對不可自創條文、不可修改條文文字、不可引用其他學校或法令的條文。回覆必須是 JSON 陣列，格式：[{"id":"等級-款號","confidence":0.9,"reason":"一句話說明對應理由"}]，confidence 為 0 到 1。若候選清單皆不相關，回覆空陣列 []。只回覆 JSON，不要其他文字。';
+    const body={model:cfg.model||P.model,messages:[{role:'system',content:sys},{role:'user',content:`學生行為描述：${q}\n\n候選條文清單：\n${candText}`}],temperature:0.2,max_tokens:800};
+    if(p==='openrouter'){ body.metadata={}; }
+    const headers={'Content-Type':'application/json',Authorization:'Bearer '+(cfg.key||'NA')};
+    if(p==='openrouter'){ headers['HTTP-Referer']=location.href; headers['X-Title']='NTC reward-punishment query'; }
+    if(p==='ollama'){ delete headers.Authorization; }
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),45000);
+    const r=await fetch(P.base,{method:'POST',headers,body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(to);
+    if(!r.ok){
+      const t=await r.text().catch(()=> '');
+      let hint='';
+      if(r.status===429) hint='（超過免費額度/速率上限，請稍後再試）';
+      else if(r.status===401||r.status===403) hint='（Key 無效，請檢查設定）';
+      else if(/no longer available|not found|NOT_FOUND/i.test(t)) hint='（此模型已下架：請到下方 AI 設定把模型改為 gemini-3.5-flash-lite 或 gemini-3.5-flash）';
+      throw new Error('HTTP '+r.status+hint+t.slice(0,150));
+    }
+    const j=await r.json();
+    const raw=((j.choices||[])[0]||{}).message?.content||'';
+    const m=raw.match(/\[[\s\S]*\]/);
+    if(!m) throw new Error('AI 回覆格式異常');
+    const picks=JSON.parse(m[0]);
+    if(!Array.isArray(picks)||picks.length===0){
+      box.innerHTML='<div class="card ai"><span class="badge ai">AI 判讀</span><div class="text">AI 認為候選條文中無高度相關者，請參考下方關鍵字搜尋結果，或換個描述方式再試。</div></div>';
+    }else{
+      const cards=picks.slice(0,3).map(pk=>{
+        const parts=String(pk.id||'').split('-');
+        const it=findItem(parts[0],parseInt(parts[1],10));
+        if(!it) return '';
+        const L=LEVEL[it.level];
+        const conf=typeof pk.confidence==='number'?' · 信心度 '+Math.round(pk.confidence*100)+'%':'';
+        return `<div class="card ai"><span class="badge ai">✨ AI 推薦 · ${L.label} · 第${it.idx}款</span><span class="conf">${conf}</span><div class="text">${hi(it.text,[] )}</div><div class="ai-reason">AI 理由：${String(pk.reason||'').replace(/</g,'&lt;')}</div><div class="src">出處：附設高職部學生獎懲辦法 · ${it.level}第${it.idx}款（條文為本地資料原文，非 AI 生成）</div></div>`;
+      }).join('');
+      box.innerHTML=cards||'<div class="card ai">AI 回覆的編號無法對應本地條文（已略過），請參考下方關鍵字結果。</div>';
+    }
+  }catch(err){
+    const msg=err.name==='AbortError'?'請求逾時（45 秒）':'';
+    box.innerHTML=`<div class="card ai"><span class="badge ai">AI 暫時不可用</span><div class="text">${msg}${String(err.message||err).replace(/</g,'&lt;')}<br>已自動退回本地關鍵字搜尋結果（顯示於下方），不影響使用。</div></div>`;
+  }finally{ btn.disabled=false; }
+}
+document.getElementById('aiBtn').addEventListener('click',aiJudge);
+document.getElementById('q').addEventListener('input',e=>render(e.target.value));
+document.getElementById('filters').addEventListener('click',e=>{
+  if(e.target.tagName!=='BUTTON')return;
+  document.querySelectorAll('#filters button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  curFilter=e.target.dataset.f;
+  render(document.getElementById('q').value);
+});
+load();
+</script>
+</body>
+</html>
